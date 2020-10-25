@@ -3,7 +3,7 @@
     <div class="banner-pic-list">
       <el-carousel height="200px" indicator-position="none">
         <el-carousel-item v-for="(item, index) in picList" :key="index">
-          <img :src="item" alt="">
+          <img :src="item.picturePath" alt="">
         </el-carousel-item>
       </el-carousel>
     </div>
@@ -15,68 +15,53 @@
         v-for="(item, index) in commList"
         :key="index"
         @click="toDetailPage(item)">
-        <img src="../../assets/book1.jpg" alt="">
+        <img :src="item.goodsPicture" alt="">
         <div class="book-info">{{item.goodsName}}</div>
-        <div>{{item.goodsPrice}}</div>
+        <div>${{item.goodsPrice}}</div>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
+import req from '@/api/comm-home.js'
+
 export default {
   name: 'comm-home',
   data () {
     return {
       picList: [
-        '../../../static/assets/u159.jpg',
-        '../../../static/assets/u161.jpg',
-        '../../../static/assets/u157.jpg'
       ],
       commList: [
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        },
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        },
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        },
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        },
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        },
-        {
-          goodsId: '1',
-          goodsName: '迪士尼爱与梦想绘本（套装共15册）[3-6岁]',
-          goodsImagePath: '../../assets/book1.jpg',
-          goodsPrice: '￥154.50'
-        }
+
       ]
     }
+  },
+  mounted () {
+    this.getcommList()
+    this.getpicList()
   },
   methods: {
     toDetailPage (data) {
       console.log(data)
+      sessionStorage.setItem('currentComm', JSON.stringify(data))
+
       this.$router.push({path: '/comm-detail'})
+    },
+    // 轮播图
+    getpicList () {
+      req('listRotationCharHome', {}).then(data => {
+        console.log(data)
+        this.picList = data.data
+        console.log('piclisst', this.picList)
+      })
+    },
+    // 热门商品
+    getcommList () {
+      req('listhotGoods', {}).then(data => {
+        this.commList = data.data.list
+        console.log(data)
+      })
     }
   }
 }
@@ -84,14 +69,16 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  background: #ddd;
+  background: #ececec;
 }
 
 .el-carousel {
   .el-carousel__container {
     .el-carousel__item {
       img {
-        width: 100%;
+        margin-top: 10px;
+        margin-left: 10px;
+        width: 95%;
         height: 100%;
       }
     }
@@ -103,8 +90,8 @@ export default {
   height: 40px;
   text-align: center;
   line-height: 40px;
-  color: #fff;
-  background: #ddd;
+  color: rgb(71, 70, 70);
+  background: rgb(243, 242, 242);
   margin-top: 10px;
 }
 
@@ -125,7 +112,8 @@ export default {
     border-radius: 10px;
 
     img {
-      width: 100%;
+      width: 95%;
+      height: 180px;
     }
 
     div:nth-child(2) {

@@ -25,3 +25,13 @@
   text-align: center;
 }
 
+// 修改confirm弹出框公共样式
+.el-message-box__wrapper {
+  .el-message-box {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+  }
+}

@@ -2,9 +2,11 @@
   <div>
     <div class="user">
         <div class="img-con">
-            <img src="../../assets/head_pic.png" >
+           <img v-show="!userinfo.imagePath" src="../../assets/head_pic.png">
+            <img v-show="userinfo.imagePath" :src="userinfo.imagePath">
+            <!-- <img src="../../assets/head_pic.png" > -->
         </div>
-        <div class="text-con">Cayla Brister</div>
+        <div class="text-con">{{userinfo.userName}}</div>
     </div>
     <div class="content">
         <div
@@ -29,34 +31,51 @@ export default {
   name: 'mine',
   data () {
     return {
+      userinfo: {},
       conList: [
         {
           img1: require('../../assets/订单.png'),
           label: '我的订单',
           img2: require('../../assets/右.png'),
-          toPath: '/order-list'
+          toPath: '/order-list',
+          func: () => {
+          }
         }, {
           img1: require('../../assets/修改密码.png'),
           label: '修改密码',
           img2: require('../../assets/右.png'),
-          toPath: '/change-password'
+          toPath: '/change-password',
+          func: () => {
+          }
         }, {
           img1: require('../../assets/邀请码.png'),
           label: '修改店铺邀请码',
           img2: require('../../assets/右.png'),
-          toPath: '/change-store-code'
+          toPath: '/change-store-code',
+          func: () => {
+          }
         }, {
           img1: require('../../assets/退出.png'),
           label: '退出登录',
           img2: require('../../assets/右.png'),
+          func: () => {
+            sessionStorage.clear('userInfo')
+            sessionStorage.clear('roleInfo')
+            sessionStorage.clear('currentComm')
+            console.log('tuichu')
+          },
           toPath: '/login'
         }
       ]
     }
   },
+  mounted () {
+    this.userinfo = JSON.parse(sessionStorage.getItem('roleInfo'))
+  },
   methods: {
     toPage (data) {
       this.$router.push({path: data.toPath})
+      this.func = data.func()
     }
   }
 }

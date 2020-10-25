@@ -2,34 +2,39 @@
   <div>
     <div class="content">
         <div class="con-top">
-            <div class="top-item" v-for="item in topList"
-            :key="item.id">
+            <div class="top-item">
                 <div class="top-img-con">
-                    <img :src="item.img" :width="item.width">
+                    <img src="../../assets/卡车.png" style="width: 18px;">
                 </div>
-                <span>{{item.text}}</span>
+                <span>取货门店:{{orderDetail.storeName}}</span>
+            </div>
+            <div class="top-item">
+                <div class="top-img-con">
+                    <img src="../../assets/position2.png" style="width: 13px;">
+                </div>
+                <span>{{orderDetail.address}}</span>
             </div>
         </div>
         <div class="line"></div>
-        <div class="order-item" v-for="item of orderList" :key="item.id">
+        <div class="order-item"  v-for="item of orderDetail.clientGoodsList" :key="item.id">
             <div class="item-center">
                 <div class="img-con">
-                    <img :src="item.img">
+                    <img :src="item.goodsPicture">
                 </div>
                 <div class="text">
-                    <div class="text-con">{{item.adv}}</div>
-                    <div class="props-con">{{item.prop}}</div>
+                    <div class="text-con">{{item.goodsName}}</div>
+                    <div class="props-con">{{item.goodsDescribe}}</div>
                     <div class="price-con">
                         <span>￥</span>
-                        <span>{{item.price}} </span>
-                        <span>x{{item.number}}</span>
+                        <span>{{item.goodsPrice}} </span>
+                        <span>x{{item.clientGoodsNum}}</span>
                     </div>
                 </div>
             </div>
-            <div class="item-bottom">
-                <span>共{{item.number}}件商品，合计￥</span>
-                <span>{{item.count}}</span>
-            </div>
+        </div>
+        <div class="item-bottom">
+            <span>共{{orderDetail.goodsCount}}件商品，合计￥</span>
+            <span>{{orderDetail.orderPrice}}</span>
         </div>
     </div>
     <div class="order-msg">
@@ -41,48 +46,55 @@
         </ul>
         <ul>
             <li></li>
-            <li>{{msgList[0]}}</li>
-            <li>{{msgList[1]}}</li>
-            <li class="active">{{msgList[2]}}</li>
+            <li>{{orderDetail.orderCode}}</li>
+            <li>{{orderDetail.createTime}}</li>
+            <li style="color: red;">{{orderType}}</li>
         </ul>
     </div>
   </div>
 </template>
 
 <script>
+import req from '@/api/order-detail.js'
 export default {
   name: 'order-detail',
   data () {
     return {
-      topList: [
-        {
-          id: '001',
-          img: require('../../assets/卡车.png'),
-          width: '18px',
-          text: '取货门店：新华书店（新街口店）'
-        }, {
-          id: '002',
-          img: require('../../assets/position2.png'),
-          width: '13px',
-          text: '取货门店：新华书店（新街口店）'
-        }
-      ],
-      orderList: [
-        {
-          id: '001',
-          adv: '一生自在季羡林的自在智慧（午静携侣寻野菜，黄昏抱猫看夕阳！金庸、贾平凹...）',
-          img: require('../../assets/book1.jpg'),
-          prop: '重量：0.32kg 系列：一生自在系列',
-          price: '42.80',
-          number: '1',
-          count: '42.80'
-        }
-      ],
-      msgList: [
-        '2020020713270034',
-        '2020-02-11 11:54:01',
-        '已付款'
-      ]
+      orderDetail: {}
+    }
+  },
+  computed: {
+    userType () {
+      return JSON.parse(sessionStorage.getItem('roleInfo')).role
+    },
+    orderType () {
+      if (this.orderDetail.orderStatus === '0') {
+        return '已下单'
+      } else if (this.orderDetail.orderStatus === '1') {
+        return '已取消'
+      } else if (this.orderDetail.orderStatus === '2') {
+        return '已到货'
+      } else if (this.orderDetail.orderStatus === '3') {
+        return '已取货'
+      } else if (this.orderDetail.orderStatus === '4') {
+        return '已完成未评价'
+      } else {
+        return '已完成已评价'
+      }
+    }
+  },
+  mounted () {
+    this.getOrderDetail()
+  },
+  methods: {
+    getOrderDetail () {
+      req('listOrderDeepen', {orderCode: this.$route.query.orderCode}).then(data => {
+        console.log('111123', data)
+        this.orderDetail = data.data[0]
+        console.log(this.orderDetail)
+        console.log(this.orderDetail)
+        // this.orderList = data.data.goodsList
+      })
     }
   }
 }
@@ -133,6 +145,7 @@ export default {
                   text-align: center;
                   img {
                       width: 84px;
+                      height: 84px;
                   }
               }
               .text {
@@ -169,18 +182,31 @@ export default {
                   }
               }
           }
-          .item-bottom {
-              width: 100%;
-              line-height: 40px;
-              text-align: right;
-              padding-top: 5px;
-              span:nth-child(1) {
-                  font-size: 15px;
-              }
-              span:nth-child(2) {
-                  font-size: 20px;
-              }
+      }
+    .item-bottom {
+        width: 100%;
+        line-height: 40px;
+        text-align: right;
+        padding-top: 5px;
+        span:nth-child(1) {
+            font-size: 15px;
+        }
+        span:nth-child(2) {
+            font-size: 20px;
+        }
+    }
+      .shop-user-info {
+        width: 100%;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+        >div {
+          height: 30px;
+          line-height: 30px;
+          img {
+            vertical-align: middle;
           }
+        }
       }
   }
   .order-msg {

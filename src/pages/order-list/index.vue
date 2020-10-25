@@ -2,92 +2,158 @@
   <div>
     <div class="leader">
         <ul>
-            <li class="active">全部订单</li>
-            <li>已付款</li>
-            <li>待取货</li>
-            <li>已完成</li>
+            <li :class="{active: this.orderType === 'all'}" @click="getOrderList('', 'all')">全部订单</li>
+            <li :class="{active: this.orderType === 'payed'}" @click="getOrderList('0', 'payed')">已付款</li>
+            <li :class="{active: this.orderType === 'pickup'}" @click="getOrderList('2', 'pickup')">待取货</li>
+            <li :class="{active: this.orderType === 'confirm'}" @click="getOrderList('4', 'confirm')">已完成</li>
         </ul>
     </div>
     <div class="order-item" v-for="item of list" :key="item.id" @click="toPage(item)">
         <div class="item-top">
             <img src="../../assets/我的订单.png" alt="">
-            <span>{{item.orderNum}}</span>
-            <span>{{item.orderStatus}}</span>
+            <span>{{item.orderCode}}</span>
+            <span>
+                {{
+                    item.orderStatus === '0' ? '已下单' :
+                    item.orderStatus === '1' ? '已取消' :
+                    item.orderStatus === '2' ? '已到货' :
+                    item.orderStatus === '3' ? '已取货' :
+                    item.orderStatus === '4' ? '已完成未评价' :
+                    '已完成已评价'
+                }}
+            </span>
         </div>
-        <div class="item-center">
+        <div class="item-center" v-for="(childItem, index) in item.clientGoodsList" :key="index" >
             <div class="img-con">
-                <img :src="item.img" alt="">
+                <img :src="childItem.goodsPicture" alt="">
             </div>
             <div class="text">
                 <div class="text-con">
-                    {{item.adv}}
+                    {{childItem.goodsName}}
                 </div>
                 <div class="props-con">
-                    {{item.prop}}
+                    {{childItem.goodsIntroduction}}
                 </div>
                 <div class="price-con">
                     <span>￥</span>
-                    <span>{{item.price}} &nbsp;</span>
-                    <span>x{{item.number}}</span>
+                    <span>{{childItem.goodsPrice}} &nbsp;</span>
+                    <span>x{{childItem.clientGoodsNum}}</span>
                 </div>
             </div>
         </div>
         <div class="item-bottom">
-            <span>共{{item.number}}件商品，合计￥</span>
-            <span>{{item.count}}</span>
+            <span>共{{item.goodsCount}}件商品，合计￥</span>
+            <span>{{item.orderPrice}}</span>
         </div>
-        <div class="item-more" v-show="item.orderStatus == '已完成'">
-            <div class="btn" @click.stop="evaluate(item)">
+          <div
+              class="btn"
+              @click.stop="changeOrderStatus(item, '1')"
+              v-show="item.orderStatus === '0' || item.orderStatus === '2' || item.orderStatus === '3'">
+                <span>取消订单</span>
+            </div>
+            <div class="btn" @click.stop="evaluate(item)" v-show="item.orderStatus === '4'">
                 <span>评价</span>
             </div>
-        </div>
+            <div class="btn" @click.stop="changeOrderStatus(item, '4')" v-show="item.orderStatus === '3'">
+                <span>确认收货</span>
+            </div>
     </div>
   </div>
 </template>
 
 <script>
+import req from '@/api/order-list.js'
 export default {
   name: 'order-list',
   data () {
     return {
+      orderType: 'all',
       list: [
-        {
-          id: '001',
-          orderNum: '2020020713270034',
-          orderStatus: '已付款',
-          adv: '一生自在季羡林的自在智慧（午静携侣寻野菜，黄昏抱猫看夕阳！金庸、贾平凹...）',
-          img: require('../../assets/book1.jpg'),
-          prop: '重量：0.32kg 系列：一生自在系列',
-          price: '42.80',
-          number: '1',
-          count: '42.80'
-        }, {
-          id: '002',
-          orderNum: '2020020713270034',
-          orderStatus: '已完成',
-          adv: '一生自在季羡林的自在智慧（午静携侣寻野菜，黄昏抱猫看夕阳！金庸、贾平凹...）',
-          img: require('../../assets/book1.jpg'),
-          prop: '重量：0.32kg 系列：一生自在系列',
-          price: '42.80',
-          number: '1',
-          count: '42.80'
-        }
       ]
     }
   },
+  mounted () {
+    this.getOrderList()
+  },
   methods: {
-	    toPage (data) {
-			this.$router.push({path: '/order-detail'})
-		},
-		evaluate (data) {
-			console.log(data)
-			this.$router.push({path: '/order-evaluate'})
-		}
+    getOrderList (orderStatus = '0', type) {
+      let data = {
+        orderStatus: orderStatus,
+        pageSize: 100,
+        pageNum: 1
+      }
+      if (!orderStatus) {
+        delete data.orderStatus
+      }
+      this.orderType = type
+      // if (JSON.parse(sessionStorage.getItem('roleInfo')).role === '3') {
+      req('listOrder', {
+        ...data
+      }).then(data => {
+        console.log(data)
+        if (data.code === 0) {
+          this.list = data.data.list
+          console.log(this.list)
+        } else {
+          this.$message.info(data.msg)
+        }
+      })
+    //    else {
+    //     req('getShopOrderList', {
+    //       ...data
+    //     }).then(data => {
+    //       console.log(data)
+    //       if (data.code === 0) {
+    //         this.list = data.data.list
+    //       } else {
+    //         this.$message.info(data.msg)
+    //       }
+    //     })
+    //   }
+    },
+    toPage (data) {
+      console.log('路哟', data)
+      this.$router.push({path: '/order-detail', query: data})
+    },
+    evaluate (data) {
+      console.log(data)
+      this.$router.push({path: '/order-evaluate', query: data})
+    },
+    changeOrderStatus (item, changeStatus) {
+      this.$confirm('确定进行该操作吗?').then(() => {
+        req('updateOrderStatus', {orderCode: item.orderCode, orderStatus: changeStatus, version: item.version}).then(data => {
+          if (data.code === 0) {
+            this.$message.success(data.msg)
+
+            this.getOrderList('', this.orderType)
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      })
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+ .btn {
+              width: 92px;
+              height: 28px;
+              border-radius: 20px;
+              position: relative;
+              border: 1.5px solid rgb(195,152,98);
+              margin-left: auto;
+              margin-top: 10px;
+              margin-bottom: 6px;
+              line-height: 28px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              span:first-child {
+                color: rgb(195,152,98);
+              }
+ }
   .leader {
       height: 64px;
       width: 100%;

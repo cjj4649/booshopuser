@@ -6,7 +6,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   strict: true,
   state: {
-    test: 123
+    // user shop dirver
+    userType: 'shop'
   },
   mutations: {
 

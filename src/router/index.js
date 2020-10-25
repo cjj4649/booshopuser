@@ -5,6 +5,7 @@ Vue.use(Router)
 
 export default new Router({
   routes: [
+
     // 登录
     {
       path: '/login',
@@ -13,7 +14,23 @@ export default new Router({
     },
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/login'
+    },
+    // 注册
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import(/* webpackChunkName: "register" */ '@/pages/register.vue'),
+      meta: {
+        title: [{
+          titleName: '注册',
+          toPath: '/register'
+        }],
+        goBack: '/login',
+        goBackShow: true,
+        headerHide: false,
+        footerShow: false
+      }
     },
     {
       path: '/home',
@@ -21,6 +38,100 @@ export default new Router({
       redirect: '/comm-home',
       component: () => import(/* webpackChunkName: "home" */ '@/pages/home.vue'),
       children: [
+        // 司机路由
+        {
+          path: '/driver-mine',
+          name: 'driver-mine',
+          component: () => import(/* webpackChunkName: "shop-order" */ '@/driver/drivermine/drivermine.vue'),
+          meta: {
+            goBack: '/driver-mine',
+            goBackShow: true,
+            headerHide: true,
+            footerShow: true
+          }
+        },
+        {
+          path: '/driver-index',
+          name: 'driver-index',
+          component: () => import(/* webpackChunkName: "shop-order" */ '@/driver/driverindex/driverindex.vue'),
+          meta: {
+            title: [
+              {
+                titleName: '负责门店信息'
+              }
+            ],
+            goBack: '/driver-index',
+            goBackShow: false,
+            headerHide: false,
+            footerShow: true
+          }
+        },
+        // 店长路由
+        {
+          path: '/shop-order-details',
+          name: 'shop-order-details',
+          component: () => import(/* webpackChunkName: "shop-order" */ '@/shop/shop-order/orderdetails.vue'),
+          meta: {
+            title: [
+              {
+                titleName: '订单详情'
+              }
+            ],
+            goBack: '/shop-order',
+            goBackShow: true,
+            headerHide: false,
+            footerShow: false
+          }
+        },
+        {
+          path: '/shop-order',
+          name: 'shop-order',
+          component: () => import(/* webpackChunkName: "shop-order" */ '@/shop/shop-order/orderlist.vue'),
+          meta: {
+            title: [
+              {
+                titleName: '我的订单',
+                toPath: '/shop-order'
+              }
+            ],
+            goBackShow: false,
+            headerHide: false,
+            footerShow: true
+          }
+        },
+        {
+          path: '/shop-driver',
+          name: 'shop-driver',
+          component: () => import(/* webpackChunkName: "shop-order" */ '@/shop/shop-driver/shopdriver.vue'),
+          meta: {
+            title: [
+              {
+                titleName: '司机信息',
+                toPath: '/shop-driver'
+              }
+            ],
+            goBackShow: false,
+            headerHide: false,
+            footerShow: true
+          }
+        },
+        {
+          path: '/shop-mine',
+          name: 'shop-mine',
+          component: () => import(/* webpackChunkName: "shop-mine" */ '@/shop/shop-mine/shopmine.vue'),
+          meta: {
+            title: [
+              {
+                titleName: '司机信息',
+                toPath: '/shopmine'
+              }
+            ],
+            goBackShow: false,
+            headerHide: true,
+            footerShow: true
+          }
+        },
+        // 用户路由
         // 首页
         {
           path: '/comm-home',
@@ -29,22 +140,6 @@ export default new Router({
           meta: {
             headerHide: true,
             footerShow: true
-          }
-        },
-        // 注册
-        {
-          path: '/register',
-          name: 'register',
-          component: () => import(/* webpackChunkName: "register" */ '@/pages/register.vue'),
-          meta: {
-            title: [{
-              titleName: '注册',
-              toPath: '/register'
-            }],
-            goBack: '/login',
-            goBackShow: true,
-            headerHide: false,
-            footerShow: false
           }
         },
         // 商品详情
@@ -174,7 +269,7 @@ export default new Router({
             ],
             goBack: '/mine',
             goBackShow: true,
-            headerHide: false,
+            headerHide: true,
             footerShow: false
           }
         },
@@ -192,7 +287,7 @@ export default new Router({
             ],
             goBack: '/mine',
             goBackShow: true,
-            headerHide: false,
+            headerHide: true,
             footerShow: false
           }
         },

@@ -1,13 +1,20 @@
 <template>
   <div class="container">
     <div class="book-banner">
-      <img src="../../assets/book1.jpg" alt="">
+      <img :src="commDetailData.goodsPicture" alt="">
     </div>
 
     <div class="book-detail">
       <div class="book-price">￥{{commDetailData.goodsPrice}}</div>
       <!-- <div class="book-name">{{commDetailData.goodsName}}</div> -->
-      <div class="book-Describe">{{commDetailData.goodsDescribe}}</div>
+       <span>{{commDetailData.goodsName}}</span>
+      <div class="book-Describe">{{commDetailData.goodsIntroduction}}</div>
+       <div class="comm-evaluate">
+        商品评分:
+        <el-rate v-model="commDetailData.goodsEvaluateScore" disabled></el-rate>
+        <span>{{commDetailData.evaluateScore}}</span>
+        分
+      </div>
       <div class="count-box">
         <span>数量</span>
 
@@ -23,29 +30,76 @@
         <span>{{address}}</span>
       </div>
     </div>
+    <div class="footer">
+      <div @click="toShopCar">
+        <img src="../../assets/shop_car2.png" alt="">
+        <span>购物车</span>
+      </div>
+
+      <div @click="addShopCar">加入购物车</div>
+      <div @click="payNow">立即购买</div>
+    </div>
   </div>
 </template>
 
 <script>
+import req from '@/api/comm-detail.js'
 export default {
   name: 'comm-detail',
   data () {
     return {
+      goodsEvaluateScore: '',
       commDetailData: {
-        goodsName: '三国演义',
-        isbn: '',
-        goodsDescribe: '《三国演义是中国古典四大名著之一，亦是中国第一部长篇历史章回小说，作者一般被认为是元末明初的罗贯中。',
-        goodsPrice: '100',
-        goodsImagePath: '',
-        goodsEvaluateScore: '1',
-        goodsAuthor: '罗挂钟',
-        goodsPress: '666'
       },
       bookCount: 1,
-      address: '新华书店（新街口店）'
+      address: '新华书店隔壁'
     }
   },
+  mounted () {
+    this.getgoods()
+  },
   methods: {
+    getgoods () {
+      req('getGoods', {goodsCode: JSON.parse(sessionStorage.getItem('currentComm')).goodsCode}).then(data => {
+        console.log(data)
+        this.commDetailData = data.data
+        console.log('商品', this.commDetailData)
+        this.commDetailData = Object.assign({}, data.data, {
+          goodsEvaluateScore: Number(data.data.goodsEvaluateScore)
+        })
+      })
+    },
+    toShopCar () {
+      this.$router.push({path: '/shop-car'})
+    },
+    addShopCar () {
+      console.log(this.commDetailData)
+      req('addShoppingCart', {goodsCode: JSON.parse(sessionStorage.getItem('currentComm')).goodsCode, cartGoodsCount: this.bookCount}).then(data => {
+        if (data.code === 0) {
+          this.$message.success(data.msg)
+          // this.$router.push({path: '/shop-car'})
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    payNow () {
+      this.$confirm('确定立即购买该商品吗?').then(() => {
+        req('addOrder', {
+          goodsCode: JSON.parse(sessionStorage.getItem('currentComm')).goodsCode,
+          clientGoodsNum: this.bookCount,
+          goodsPrice: this.commDetailData.goodsPrice,
+          storeCode: JSON.parse(sessionStorage.getItem('roleInfo')).storeCode
+        }).then(data => {
+          if (data.code === 0) {
+            this.$message.success(data.msg)
+            this.$router.push({path: '/order-list'})
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      })
+    },
     countDelete () {
       if (this.bookCount > 1) {
         this.bookCount--
@@ -154,6 +208,52 @@ export default {
     .iconhtmal5icon14 {
       color: #ddd;
     }
+  }
+}
+.footer {
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  align-items: center;
+   div:first-child {
+    width: 50px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 12px;
+    img {
+      width: 25px;
+      height: 25px;
+    }
+  }
+  div:nth-child(2) {
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border: 1px solid rgb(197, 156, 104);
+    background: #fff;
+    border-radius: 10px;
+    margin-left: 10px;
+  }
+  div:nth-child(3) {
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: rgb(197, 156, 104);
+    color: #fff;
+    border-radius: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 }
 </style>

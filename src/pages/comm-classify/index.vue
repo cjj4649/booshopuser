@@ -1,21 +1,11 @@
 <template>
   <div class="container">
     <ul class="book-classify">
-      <li class="active">
+      <li :class="{active: item.classifyId === currentClassify.classifyId}"
+       v-for="(item, index) in oneClassifyList" :key="index"
+        @click="getTwoClassify(item)">
         <b></b>
-        <span>古典文学</span>
-      </li>
-      <li>
-        <b></b>
-        <span>任务传记</span>
-      </li>
-      <li>
-        <b></b>
-        <span>世界名著</span>
-      </li>
-      <li>
-        <b></b>
-        <span>教育</span>
+        <span>{{item.classifyName}}</span>
       </li>
     </ul>
 
@@ -24,7 +14,7 @@
         <div class="book-classify-item-title">{{item.classifyName}}</div>
         <ul class="book-list">
           <li v-for="(childItem, childIndex) in item.goodsList" :key="childIndex" @click="getCommDetail(childItem)">
-            <img src="../../assets/book1.jpg" alt="">
+            <img :src="childItem.goodsPicture" alt="">
             <div>{{childItem.goodsName}}</div>
             <div>
               ￥{{childItem.goodsPrice}}
@@ -37,102 +27,55 @@
 </template>
 
 <script>
+import req from '@/api/comm-classify.js'
 export default {
   name: 'comm-classify',
   data () {
     return {
+      oneClassifyList: [],
+      currentClassify: {},
       commList: [
-        {
-          classifyId: '',
-          classifyName: '小说',
-          goodsList: [
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            }
-          ]
-        },
-        {
-          classifyId: '',
-          classifyName: '散文',
-          goodsList: [
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            },
-            {
-              goodsId: '',
-              goodsImagePath: './image/book1.jpg',
-              goodsName: '迪士尼爱与梦想绘本',
-              goodsPrice: '131.30'
-            }
-          ]
-        }
       ]
     }
   },
+  mounted () {
+    this.getClassify()
+  },
   methods: {
-    getCommDetail (data) {
-      console.log(data)
+    getClassify () {
+      req('listFirstClass', {}).then(data => {
+        console.log('一级', data)
+        this.oneClassifyList = data.data
+        this.currentClassify = this.oneClassifyList[0]
+        this.getTwoClassify(this.currentClassify)
+      })
+    },
+    getTwoClassify (item) {
+      this.currentClassify = item
+      req('listSecondClass', {classifyId: item.classifyId}).then(data => {
+        console.log('二级', data)
+        this.commList = data.data
+      })
+    },
+    getCommDetail (item) {
+      sessionStorage.setItem('currentComm', JSON.stringify(item))
+      this.$router.push({path: '/comm-detail'})
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+img {
+  width: 113px;
+   height: 128px;
+}
 .container {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
   background: #ddd;
-
   .book-classify {
     position: absolute;
     top: 0;
@@ -140,7 +83,6 @@ export default {
     bottom: 0;
     width: 20%;
     background: #fff;
-
     li {
       position: relative;
       width: 100%;
@@ -148,18 +90,15 @@ export default {
       text-align: center;
       line-height: 40px;
       font-size: 14px;
-
       >span {
         display: inline-block;
         width: 100%;
         height: 100%;
       }
-
     }
     li.active {
       color: rgb(197, 156, 104);
       background: #ddd;
-
       b {
         position: absolute;
         left: 0;
@@ -171,7 +110,6 @@ export default {
       }
     }
   }
-
   .book-classify-conteiner {
     position: absolute;
     top: 0;
@@ -179,7 +117,6 @@ export default {
     bottom: 0;
     overflow: auto;
     width: 78%;
-
     .book-classify-item {
       .book-classify-item-title {
         width: 100%;
@@ -188,7 +125,6 @@ export default {
         box-sizing: border-box;
         line-height: 40px;
       }
-
       .book-list {
         width: 100%;
         background: #fff;
@@ -196,7 +132,6 @@ export default {
         flex-wrap: wrap;
         padding: 10px 0;
         box-sizing: border-box;
-
         li {
           display: flex;
           flex-direction: column;
@@ -204,20 +139,16 @@ export default {
           align-items: center;
           width: 50%;
           margin-bottom: 10px;
-
           img {
             width: 70%;
           }
-
           div:nth-child(2) {
             font-size: 12px;
           }
-
           div:nth-child(3) {
             color: red;
             font-size: 14px;
             font-weight: bold;
-
             span {
               color: #ddd;
               font-weight: normal;

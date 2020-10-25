@@ -21,7 +21,75 @@
       </el-container>
 
       <el-footer v-show="meta.footerShow">
-        <div @click="$router.push({path: '/comm-home'})">
+
+        <div @click="$router.push({path: '/shop-order'})" v-show="userType === '2'">
+          <img src="../assets/u1075.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">订单</div>
+        </div>
+        <div @click="$router.push({path: '/shop-driver'})" v-show="userType === '2'">
+          <img src="../assets/u1080.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">司机</div>
+        </div>
+        <div @click="$router.push({path: '/shop-mine'})" v-show="userType === '2'">
+          <img src="../assets/u1080.png" alt="">
+          <div :style="{color: currentPath === '/mine' ? '#C39862' : '#333333'}">我的</div>
+        </div>
+
+        <div @click="$router.push({path: '/driver-index'})" v-show="userType === '4'">
+          <img src="../assets/home2.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">门店</div>
+        </div>
+        <div @click="$router.push({path: '/driver-mine'})" v-show="userType === '4'">
+          <img src="../assets/mine2.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">我的</div>
+        </div>
+
+        <div @click="$router.push({path: '/comm-home'})" v-show="userType === '3'">
+          <img v-show="currentPath !== '/comm-home'" src="../assets/home2.png" alt="">
+          <img v-show="currentPath === '/comm-home'" src="../assets/home.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">首页</div>
+        </div>
+        <div @click="$router.push({path: '/comm-classify'})" v-show="userType === '3'">
+          <img v-show="currentPath !== '/comm-classify'" src="../assets/classify2.png" alt="">
+          <img v-show="currentPath === '/comm-classify'" src="../assets/classify.png" alt="">
+          <div :style="{color: currentPath === '/comm-classify' ? '#C39862' : '#333333'}">分类</div>
+        </div>
+        <div @click="$router.push({path: '/shop-car'})" v-show="userType === '3'">
+          <img v-show="currentPath !== '/shop-car'" src="../assets/shop_car2.png" alt="">
+          <img v-show="currentPath === '/shop-car'" src="../assets/shop_car.png" alt="">
+          <div :style="{color: currentPath === '/shop-car' ? '#C39862' : '#333333'}">购物车</div>
+        </div>
+        <div @click="$router.push({path: '/mine'})" v-show="userType === '3'">
+          <img v-show="currentPath !== '/mine'" src="../assets/mine2.png" alt="">
+          <img v-show="currentPath === '/mine'" src="../assets/mine.png" alt="">
+          <div :style="{color: currentPath === '/mine' ? '#C39862' : '#333333'}">我的</div>
+        </div>
+      </el-footer>
+       <!-- <el-footer v-show="meta.footerShow">
+
+        <div @click="$router.push({path: '/shop-order'})">
+          <img src="../assets/u1075.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">订单</div>
+        </div>
+        <div @click="$router.push({path: '/shop-driver'})">
+          <img src="../assets/u1080.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">司机</div>
+        </div>
+        <div @click="$router.push({path: '/shop-mine'})">
+          <img src="../assets/u1080.png" alt="">
+          <div :style="{color: currentPath === '/mine' ? '#C39862' : '#333333'}">我的</div>
+        </div>
+
+        <div @click="$router.push({path: '/driver-index'})" v-show="userType === '4'">
+          <img src="../assets/home2.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">门店</div>
+        </div>
+        <div @click="$router.push({path: '/driver-mine'})" v-show="userType === '4'">
+          <img src="../assets/mine2.png" alt="">
+          <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">我的</div>
+        </div> -->
+
+        <!-- <div @click="$router.push({path: '/comm-home'})">
           <img v-show="currentPath !== '/comm-home'" src="../assets/home2.png" alt="">
           <img v-show="currentPath === '/comm-home'" src="../assets/home.png" alt="">
           <div :style="{color: currentPath === '/comm-home' ? '#C39862' : '#333333'}">首页</div>
@@ -40,8 +108,9 @@
           <img v-show="currentPath !== '/mine'" src="../assets/mine2.png" alt="">
           <img v-show="currentPath === '/mine'" src="../assets/mine.png" alt="">
           <div :style="{color: currentPath === '/mine' ? '#C39862' : '#333333'}">我的</div>
-        </div>
-      </el-footer>
+        </div> -->
+      <!-- </el-footer> -->
+
     </el-container>
   </div>
 </template>
@@ -68,6 +137,9 @@ export default {
     },
     currentPath () {
       return this.$route.path
+    },
+    userType () {
+      return JSON.parse(sessionStorage.getItem('roleInfo')).role
     }
   },
   methods: {
@@ -95,7 +167,6 @@ export default {
   top: 50px;
   bottom: 0;
 }
-
 .el-header {
   display: flex;
   justify-content: space-between;

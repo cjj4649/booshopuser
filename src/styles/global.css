@@ -1,3 +1,28 @@
+
+.el-form .el-form-item .el-form-item__content .el-select {
+  width: 100%;
+}
+
+.el-form .el-form-item .el-form-item__content .el-input .el-input__inner {
+  border-radius: 0;
+  height: 30px;
+}
+
+.el-button {
+  padding: 0 15px;
+  border-radius: 0;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.el-message-box__wrapper .el-message-box {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+}
 body {
   margin: 0;
   padding: 0;
@@ -13,3 +38,4 @@ li {
   margin: 0;
   padding: 0;
 }
+
